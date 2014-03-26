@@ -298,8 +298,7 @@ namespace Microsoft.Xna.Framework.Content
 				// MonoGame try to load as a non-content file
 				assetName = TitleContainer.GetFilename(
 					Path.Combine(
-						AppDomain.CurrentDomain.BaseDirectory,
-						RootDirectory,
+						RootDirectoryFullPath,
 						assetName
 					)
 				);
