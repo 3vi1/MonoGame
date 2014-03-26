@@ -221,8 +221,14 @@ namespace Microsoft.Xna.Framework.Content
 			try
 			{
 				string assetPath = Path.Combine(RootDirectory, assetName) + ".xnb";
-				stream = TitleContainer.OpenStream(assetPath);
-
+				if (Path.IsPathRooted(RootDirectory))
+				{
+					stream = File.OpenRead(assetPath);
+				}
+				else
+				{
+					stream = TitleContainer.OpenStream(assetPath);
+				}
 			}
 			catch (FileNotFoundException fileNotFound)
 			{
@@ -290,7 +296,13 @@ namespace Microsoft.Xna.Framework.Content
 			catch (ContentLoadException ex)
 			{
 				// MonoGame try to load as a non-content file
-				assetName = TitleContainer.GetFilename(Path.Combine(RootDirectory, assetName));
+				assetName = TitleContainer.GetFilename(
+					Path.Combine(
+						AppDomain.CurrentDomain.BaseDirectory,
+						RootDirectory,
+						assetName
+					)
+				);
 				assetName = Normalize<T>(assetName);
 				if (string.IsNullOrEmpty(assetName))
 				{
@@ -355,7 +367,7 @@ namespace Microsoft.Xna.Framework.Content
 		{
 			if (typeof(T) == typeof(Texture2D) || typeof(T) == typeof(Texture))
 			{
-				using (Stream assetStream = TitleContainer.OpenStream(assetName))
+				using (Stream assetStream = File.OpenRead(assetName))
 				{
 					Texture2D texture = Texture2D.FromStream(
 						graphicsDeviceService.GraphicsDevice,
@@ -375,7 +387,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			else if ((typeof(T) == typeof(SoundEffect)))
 			{
-				using (Stream s = TitleContainer.OpenStream(assetName))
+				using (Stream s = File.OpenRead(assetName))
 				{
 					return SoundEffect.FromStream(s);
 				}
@@ -386,7 +398,7 @@ namespace Microsoft.Xna.Framework.Content
 			}
 			else if ((typeof(T) == typeof(Effect)))
 			{
-				using (Stream assetStream = TitleContainer.OpenStream(assetName))
+				using (Stream assetStream = File.OpenRead(assetName))
 				{
 					byte[] data = new byte[assetStream.Length];
 					assetStream.Read(data, 0, (int) assetStream.Length);
